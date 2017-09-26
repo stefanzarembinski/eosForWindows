@@ -10,7 +10,8 @@ Download [MobaXterm](#http://mobaxterm.mobatek.net/download.html). It is much ea
 
 1. Upgrade Ubuntu:
 ```bash
-sudo apt upgrade
+sudo apt update
+sudo apt full-upgrade
 sudo apt install nedit
 ```
 2. Make a workspace for EOS. Let it be `~/Workspaces/EOS`, for example.

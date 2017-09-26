@@ -37,7 +37,8 @@ Enable-WindowsOptionalFeature -Online -FeatureName Microsoft-Windows-Subsystem-L
     * Clicking the start menu shortcut
 6. Upgrade Ubuntu:
 ```bash
-sudo apt upgrade
+sudo apt update
+sudo apt full-upgrade
 ```
     
 After installation the Linux distribution will be located at: `%localappdata%\lxss\`.
