@@ -67,7 +67,6 @@ You may dislike the dark-blue output of the *bash*. If so, open the menu ot the 
     * CMakeTools
     * CMake Tools Helper
     * Code Runner
-    * Visual Studio Team
  
 ## Set up a workspace
 
@@ -76,28 +75,23 @@ You may dislike the dark-blue output of the *bash*. If so, open the menu ot the 
 2. Make environment variables, defining the workspace:
 
 ```bash
-export EOSIO_INSTALL_DIR=/mnt/e/Workspaces/EOS/eos && \
-echo "export EOSIO_INSTALL_DIR=/mnt/e/Workspaces/EOS/eos"  >> ~/.bashrc && \
-export EOS_PROGRAMS=${EOSIO_INSTALL_DIR}/build/programs && \
-echo "export EOS_PROGRAMS=${EOSIO_INSTALL_DIR}/build/programs" >> ~/.bashrc && \
+echo "export WORKSPACE_DIR=/mnt/e/Workspaces/EOS"  >> ~/.bashrc
+echo "export EOSIO_INSTALL_DIR=${WORKSPACE_DIR}/eos"  >> ~/.bashrc
+echo "export EOS_PROGRAMS=${EOSIO_INSTALL_DIR}/build/programs" >> ~/.bashrc
 source ~/.bashrc
 ```
 
 3. Clean install Ubuntu
 
 ```bash
-# Try with a clean installation:
-cmake --version
-# if not installed, then
-sudo apt install cmake 
-# else remove this issue.
+sudo apt install cmake
+sudo apt install git
 
-export BOOST_ROOT=${HOME}/opt/boost_1_64_0 && \
 echo "export BOOST_ROOT=${HOME}/opt/boost_1_64_0" >> ~/.bashrc && \
 source ~/.bashrc && \ # reload .bashrc
 export TEMP_DIR=/tmp
 
-cd ${EOSIO_INSTALL_DIR}/../
+cd ${WORKSPACE_DIR}
 git clone https://github.com/eosio/eos --recursive
 cd eos && ./build.sh ubuntu full
 ```
@@ -124,11 +118,9 @@ locate /build/genesis.json
     /mnt/e/Workspaces/EOS/eos/build/genesis.json
 
 locate build/programs/eosd/data-dir/config.ini
-
 ```
 
 Edit *config.ini*, appending the following text (be careful to set the proper value for the `genesis.json` path, and comment out the original `enable-stale-production` definition):
-
 ```
 genesis-json = /mnt/e/Workspaces/EOS/eos/build/genesis.json # !!!!!!!!!!!!!!!!!!
 enable-stale-production = true
@@ -191,3 +183,8 @@ cmake -DCMAKE_BUILD_TYPE=Debug \
     -DOPENSSL_LIBRARIES=/usr/local/opt/openssl/lib \
     ../ && make
 ```
+## Troubleshooting
+
+### 13 NSt8ios_base7failureB5cxx11E: basic_ios::clear: iostream error
+
+This error status happens when `eosd` is disrupted. The minimal cure, that we know, is deleting `${EOS_PROGRAMS}/eosd/data-dir`, and subsequent proceeding *All is ready now" section.
