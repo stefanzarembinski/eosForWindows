@@ -59,6 +59,7 @@ You may dislike the dark-blue output of the *bash*. If so, open the menu ot the 
     * and add the following within the settings.json pane:
 “terminal.integrated.shell.windows”: “C:\\Windows\\sysnative\\bash.exe”
     * You can now toggle the terminal view with ``CTRL+` `` or `View => Toggle Integrated Terminal`
+    * Note that you can have more then one active terminal threads (`Ctr + Shift + ` `).
 3. Consider adding extensions that can be useful for C++ development:
     * `Ctr + Shift + X` to open the EXTENSIONS panel.
     * C/C++
@@ -67,7 +68,7 @@ You may dislike the dark-blue output of the *bash*. If so, open the menu ot the 
     * CMake Tools Helper
     * Code Runner
     * Visual Studio Team
-
+ 
 ## Set up a workspace
 
 1. Make a workspace for EOS on the Windows file system, to control it from both systems. Let it be `E:\Workspaces\EOS', for example. On the Linux file system, it is `/mnt/e/Workspaces/EOS`.
@@ -75,14 +76,14 @@ You may dislike the dark-blue output of the *bash*. If so, open the menu ot the 
 2. Make environment variables, defining the workspace:
 
 ```bash
-export EOS_HOME=/mnt/e/Workspaces/EOS && \
-echo "export EOS_HOME=/mnt/e/Workspaces/EOS" >> ~/.bashrc && \
-export EOS_PROGRAMS=${EOS_HOME}/eos/build/programs && \
-echo "export EOS_PROGRAMS=${EOS_HOME}/eos/build/programs" >> ~/.bashrc && \
+export EOSIO_INSTALL_DIR=/mnt/e/Workspaces/EOS/eos && \
+echo "export EOSIO_INSTALL_DIR=/mnt/e/Workspaces/EOS/eos"  >> ~/.bashrc && \
+export EOS_PROGRAMS=${EOSIO_INSTALL_DIR}/build/programs && \
+echo "export EOS_PROGRAMS=${EOSIO_INSTALL_DIR}/build/programs" >> ~/.bashrc && \
 source ~/.bashrc
 ```
 
-3. Do clean install Ubuntu
+3. Clean install Ubuntu
 
 ```bash
 # Try with a clean installation:
@@ -96,7 +97,7 @@ echo "export BOOST_ROOT=${HOME}/opt/boost_1_64_0" >> ~/.bashrc && \
 source ~/.bashrc && \ # reload .bashrc
 export TEMP_DIR=/tmp
 
-cd $EOS_HOME
+cd ${EOSIO_INSTALL_DIR}/../
 git clone https://github.com/eosio/eos --recursive
 cd eos && ./build.sh ubuntu full
 ```
@@ -112,15 +113,24 @@ Now, you have the EOS code in your *Windows 10* computer, compiled resulting wit
 Now, you can do tests described in eos/README.md. For completeness, let us prove that eos can be started.
 
 ```bash 
-cd $EOS_PROGRAMS/eosd
-./eosd
+cd $EOS_PROGRAMS/eosd && ./eosd
 ```
 If *eosd* does not exit with an error, close it immediately with <kbd>Ctrl-C</kbd>.
 
-Edit *data-dir/config.ini*, appending the following text (be careful to set the proper value for the `genesis-json` path, and comment out the original `enable-stale-production` definition):
+Find the `genesis.json` path, and the `config.ini` path:
+
+```bash
+locate /build/genesis.json
+    /mnt/e/Workspaces/EOS/eos/build/genesis.json
+
+locate build/programs/eosd/data-dir/config.ini
 
 ```
-genesis-json = /mnt/e/Workspaces/EOS/eos/genesis.json # !!!!!!!!!!!!!!!!!
+
+Edit *config.ini*, appending the following text (be careful to set the proper value for the `genesis.json` path, and comment out the original `enable-stale-production` definition):
+
+```
+genesis-json = /mnt/e/Workspaces/EOS/eos/build/genesis.json # !!!!!!!!!!!!!!!!!!
 enable-stale-production = true
 
 producer-name = inita
@@ -142,15 +152,14 @@ producer-name = initr
 producer-name = inits
 producer-name = initt
 producer-name = initu
-# Load the block producer plugin, so you can produce blocks
+
 plugin = eos::producer_plugin
-# Wallet plugin
-plugin = eos::wallet_api_plugin
-# As well as API and HTTP plugins
 plugin = eos::chain_api_plugin
+plugin = eos::wallet_api_plugin
+plugin = eos::account_history_api_plugin
 plugin = eos::http_plugin 
 ```
-Start *eosd* again, it should start block production. It happens that is hangs at the first attempt. Do <kbd>Ctrl-C</kbd>, wait, and try again.
+Start *eosd* again, it should start block production. It happens that is suspends at the first attempt. Do <kbd>Ctrl-C</kbd>, wait, wait, and try again.
 
 You can run *eosd*, as well as other executables, in mother any ways, but not in the same time:
 
@@ -165,21 +174,20 @@ bash
 cd $EOS_PROGRAMS/eosd
 ./eosd
 ```
-## If you need to update EOS...
+## Update EOS, if needed
 
 ```bash
-cd $EOS_HOME/eos
+cd $EOSIO_INSTALL_DIR
 git pull
 
 rm -r build && mkdir build && cd build
 
 cmake -DCMAKE_BUILD_TYPE=Debug \
--DCMAKE_C_COMPILER=clang-4.0 \
--DCMAKE_CXX_COMPILER=clang++-4.0 \
--DWASM_LLVM_CONFIG=${HOME}/opt/wasm/bin/llvm-config \
--DBINARYEN_BIN=${HOME}/opt/binaryen/bin \
--DOPENSSL_ROOT_DIR=/usr/local/opt/openssl \
--DOPENSSL_LIBRARIES=/usr/local/opt/openssl/lib \
-../
-make
+    -DCMAKE_C_COMPILER=clang-4.0 \
+    -DCMAKE_CXX_COMPILER=clang++-4.0 \
+    -DWASM_LLVM_CONFIG=${HOME}/opt/wasm/bin/llvm-config \
+    -DBINARYEN_BIN=${HOME}/opt/binaryen/bin \
+    -DOPENSSL_ROOT_DIR=/usr/local/opt/openssl \
+    -DOPENSSL_LIBRARIES=/usr/local/opt/openssl/lib \
+    ../ && make
 ```

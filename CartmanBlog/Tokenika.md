@@ -17,13 +17,13 @@ sudo apt install nedit
 
 3. Make environment variables, defining the workspace:
 ```bash
-export EOS_HOME=~/Workspaces/EOS 
-echo "EOS_HOME=~/Workspaces/EOS" >> ~/.bashrc
-export EOS_PROGRAMS=${EOS_HOME}/eos/build/programs
-echo "EOS_PROGRAMS=${EOS_HOME}/eos/build/programs" >> ~/.bashrc
+export EOSIO_INSTALL_DIR=/mnt/e/Workspaces/EOS/eos && \
+echo "export EOSIO_INSTALL_DIR=/mnt/e/Workspaces/EOS/eos"  >> ~/.bashrc && \
+export EOS_PROGRAMS=${EOSIO_INSTALL_DIR}/build/programs && \
+echo "export EOS_PROGRAMS=${EOSIO_INSTALL_DIR}/build/programs" >> ~/.bashrc && \
 source ~/.bashrc
-``
-4. Do clean install Ubuntu
+```
+4. Clean install Ubuntu
 
 ```bash
 export BOOST_ROOT=${HOME}/opt/boost_1_64_0 >> ~/.bashrc
@@ -31,7 +31,7 @@ echo "export BOOST_ROOT=${HOME}/opt/boost_1_64_0" >> ~/.bashrc
 source ~/.bashrc
 export TEMP_DIR=/tmp
 
-cd $EOS_HOME
+cd ${EOSIO_INSTALL_DIR}/../
 git clone https://github.com/eosio/eos --recursive
 cd eos && ./build.sh ubuntu full
 ```
@@ -47,21 +47,27 @@ Now, you have the EOS code in your *Windows 10* computer, compiled resulting wit
 Now, you can do tests described in eos/README.md. For completeness, let us prove that eos can be started.
 
 ```bash 
-cd ${EOS_PROGRAMS}/eosd
-./eosd
+cd ${EOS_PROGRAMS}/eosd && ./eosd
 ```
 If *eosd* does not exit with an error, close it immediately with <kbd>Ctrl-C</kbd>.
 
-Open *nedit* GUI editor:
+*EOS* uses a configuration file named `config.ini`, that needs a reference to a *genesis* file:
 
 ```bash
-nedit ${EOS_PROGRAMS}/eosd/
+locate /build/genesis.json
+    /home/jakub/Workspaces/EOS/eos/genesis.json
 ```
 
-Edit *data-dir/config.ini*, appending the following text (be careful to set the proper value for the `genesis-json` path, and comment out the original `enable-stale-production` definition):
+Open *nedit* GUI editor with the configuration file ...
+
+```bash
+nedit `locate build/programs/eosd/data-dir/config.ini`
+```
+
+... and edit it, appending the following text, setting the proper value for the `genesis-json` path, and commenting out the original `enable-stale-production` definition:
 
 ```
-genesis-json = /mnt/e/Workspaces/EOS/eos/genesis.json # !!!!!!!!!!!!!!!!!
+genesis-json = /home/jakub/Workspaces/EOS/eos/genesis.json
 enable-stale-production = true
 
 producer-name = inita
@@ -83,30 +89,28 @@ producer-name = initr
 producer-name = inits
 producer-name = initt
 producer-name = initu
-# Load the block producer plugin, so you can produce blocks
+
 plugin = eos::producer_plugin
-# Wallet plugin
-plugin = eos::wallet_api_plugin
-# As well as API and HTTP plugins
 plugin = eos::chain_api_plugin
+plugin = eos::wallet_api_plugin
+plugin = eos::account_history_api_plugin
 plugin = eos::http_plugin 
 ```
 
-## Update EOS
+## Update EOS, if needed
 
 ```bash
-cd $EOS_HOME/eos
+cd ${EOSIO_INSTALL_DIR}/
 git pull
 
 cd
 
 cmake -DCMAKE_BUILD_TYPE=Release \
--DCMAKE_C_COMPILER=clang-4.0 \
--DCMAKE_CXX_COMPILER=clang++-4.0 \
--DWASM_LLVM_CONFIG=${HOME}/opt/wasm/bin/llvm-config \
--DBINARYEN_BIN=${HOME}/opt/binaryen/bin \
--DOPENSSL_ROOT_DIR=/usr/local/opt/openssl \
--DOPENSSL_LIBRARIES=/usr/local/opt/openssl/lib \
-../
-make
+    -DCMAKE_C_COMPILER=clang-4.0 \
+    -DCMAKE_CXX_COMPILER=clang++-4.0 \
+    -DWASM_LLVM_CONFIG=${HOME}/opt/wasm/bin/llvm-config \
+    -DBINARYEN_BIN=${HOME}/opt/binaryen/bin \
+    -DOPENSSL_ROOT_DIR=/usr/local/opt/openssl \
+    -DOPENSSL_LIBRARIES=/usr/local/opt/openssl/lib \
+    ../ && make
 ```
