@@ -103,7 +103,7 @@ plugin = eos::http_plugin
 cd ${EOSIO_INSTALL_DIR}/
 git pull
 
-cd
+rm -r build && mkdir build && cd build
 
 cmake -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_C_COMPILER=clang-4.0 \
