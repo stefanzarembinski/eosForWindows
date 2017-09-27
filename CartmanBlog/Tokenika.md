@@ -18,21 +18,23 @@ sudo apt install nedit
 
 3. Make environment variables, defining the workspace:
 ```bash
-echo "export WORKSPACE_DIR=/mnt/e/Workspaces/EOS"  >> ~/.bashrc
-echo "export EOSIO_INSTALL_DIR=${WORKSPACE_DIR}/eos"  >> ~/.bashrc
-echo "export EOS_PROGRAMS=${EOSIO_INSTALL_DIR}/build/programs" >> ~/.bashrc
-source ~/.bashrc
+export WORKSPACE_DIR=~/Workspaces/EOS && \
+export EOSIO_INSTALL_DIR=${WORKSPACE_DIR}/eos && \
+export EOS_PROGRAMS=${EOSIO_INSTALL_DIR}/build/programs && \
+echo "export WORKSPACE_DIR=${WORKSPACE_DIR}"  >> ~/.bashrc && \
+echo "export EOSIO_INSTALL_DIR=${EOSIO_INSTALL_DIR}"  >> ~/.bashrc && \
+echo "export EOS_PROGRAMS=${EOS_PROGRAMS}" >> ~/.bashrc
 ```
 4. Clean install Ubuntu
 
 ```bash
-echo "export BOOST_ROOT=${HOME}/opt/boost_1_64_0" >> ~/.bashrc
-source ~/.bashrc
+export BOOST_ROOT=${HOME}/opt/boost_1_64_0
+
+echo "export BOOST_ROOT=${}" >> ~/.bashrc
 export TEMP_DIR=/tmp
 
 mkdir eos
-cd cd ${WORKSPACE_DIR}
-git clone https://github.com/eosio/eos --recursive
+cd cd ${WORKSPACE_DIR} && git clone https://github.com/eosio/eos --recursive
 cd eos && ./build.sh ubuntu full
 ```
 

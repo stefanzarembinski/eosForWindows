@@ -37,8 +37,10 @@ Enable-WindowsOptionalFeature -Online -FeatureName Microsoft-Windows-Subsystem-L
     * Clicking the start menu shortcut
 6. Upgrade Ubuntu:
 ```bash
-sudo apt update
-sudo apt full-upgrade
+sudo apt update && \
+sudo apt full-upgrade && \
+sudo apt install cmake && \
+sudo apt install git
 ```
     
 After installation the Linux distribution will be located at: `%localappdata%\lxss\`.
@@ -71,30 +73,28 @@ You may dislike the dark-blue output of the *bash*. If so, open the menu ot the 
  
 ## Set up a workspace
 
-1. Make a workspace for EOS on the Windows file system, to control it from both systems. Let it be `E:\Workspaces\EOS', for example. On the Linux file system, it is `/mnt/e/Workspaces/EOS`.
+1. Make a workspace for EOS on the Windows file system, to control it from both systems. Let it be `E:\Workspaces\EOS`, for example. On the Linux file system, it is `/mnt/e/Workspaces/EOS`.
 
 2. Make environment variables, defining the workspace:
 
 ```bash
-echo "export WORKSPACE_DIR=/mnt/e/Workspaces/EOS"  >> ~/.bashrc
-echo "export EOSIO_INSTALL_DIR=${WORKSPACE_DIR}/eos"  >> ~/.bashrc
-echo "export EOS_PROGRAMS=${EOSIO_INSTALL_DIR}/build/programs" >> ~/.bashrc
-source ~/.bashrc
+export WORKSPACE_DIR=/mnt/e/Workspaces/EOS && \
+export EOSIO_INSTALL_DIR=${WORKSPACE_DIR}/eos && \
+export EOS_PROGRAMS=${EOSIO_INSTALL_DIR}/build/programs && \
+echo "export WORKSPACE_DIR=${WORKSPACE_DIR}"  >> ~/.bashrc && \
+echo "export EOSIO_INSTALL_DIR=${EOSIO_INSTALL_DIR}"  >> ~/.bashrc && \
+echo "export EOS_PROGRAMS=${EOS_PROGRAMS}" >> ~/.bashrc
 ```
 
 3. Clean install Ubuntu
 
 ```bash
-sudo apt install cmake
-sudo apt install git
-
-echo "export BOOST_ROOT=${HOME}/opt/boost_1_64_0" >> ~/.bashrc && \
-source ~/.bashrc && \ # reload .bashrc
+export BOOST_ROOT=${HOME}/opt/boost_1_64_0 && \
+echo "export BOOST_ROOT=${BOOST_ROOT}" >> ~/.bashrc && \
 export TEMP_DIR=/tmp
 
-cd ${WORKSPACE_DIR}
-git clone https://github.com/eosio/eos --recursive
-cd eos && ./build.sh ubuntu full
+cd ${WORKSPACE_DIR} &&  git clone https://github.com/eosio/eos --recursive
+cd ${EOSIO_INSTALL_DIR} && ./build.sh ubuntu full
 ```
 
 ## All is ready now
