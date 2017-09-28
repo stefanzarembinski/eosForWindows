@@ -89,12 +89,11 @@ echo "export EOS_PROGRAMS=${EOS_PROGRAMS}" >> ~/.bashrc
 3. Clean install Ubuntu
 
 ```bash
-export BOOST_ROOT=${HOME}/opt/boost_1_64_0 && \
-echo "export BOOST_ROOT=${BOOST_ROOT}" >> ~/.bashrc && \
-export TEMP_DIR=/tmp
-
 cd ${WORKSPACE_DIR} &&  git clone https://github.com/eosio/eos --recursive
-cd ${EOSIO_INSTALL_DIR} && ./build.sh ubuntu full
+
+export TEMP_DIR=/tmp && \
+cd ${EOSIO_INSTALL_DIR} && ./build.sh ubuntu full && \
+echo "export BOOST_ROOT=${BOOST_ROOT}" >> ~/.bashrc
 ```
 
 ## All is ready now
@@ -115,8 +114,9 @@ If *eosd* does not exit with an error, close it immediately with <kbd>Ctrl-C</kb
 Find the `genesis.json` path, and the `config.ini` path:
 
 ```bash
-locate /build/genesis.json
-    /mnt/e/Workspaces/EOS/eos/build/genesis.json
+locate build/genesis.json
+# response is
+# /mnt/e/Workspaces/EOS/eos/build/genesis.json
 
 locate build/programs/eosd/data-dir/config.ini
 ```
@@ -154,19 +154,6 @@ plugin = eos::http_plugin
 ```
 Start *eosd* again, it should start block production. It happens that is suspends at the first attempt. Do <kbd>Ctrl-C</kbd>, wait, wait, and try again.
 
-You can run *eosd*, as well as other executables, in mother any ways, but not in the same time:
-
-* With the *Bush On Ubuntu on Windows* prompt that can be launched from the *Start Up* menu:
-```bash
-cd $EOS_PROGRAMS/eosd
-./eosd
-``` 
-* With the Windows *Command Prompt*:
-```bash
-bash
-cd $EOS_PROGRAMS/eosd
-./eosd
-```
 ## Update EOS, if needed
 
 ```bash
