@@ -28,14 +28,13 @@ echo "export EOS_PROGRAMS=${EOS_PROGRAMS}" >> ~/.bashrc
 4. Clean install Ubuntu
 
 ```bash
-export BOOST_ROOT=${HOME}/opt/boost_1_64_0
-
-echo "export BOOST_ROOT=${}" >> ~/.bashrc
-export TEMP_DIR=/tmp
 
 mkdir eos
 cd cd ${WORKSPACE_DIR} && git clone https://github.com/eosio/eos --recursive
-cd eos && ./build.sh ubuntu full
+
+export TEMP_DIR=/tmp && \
+cd ${EOSIO_INSTALL_DIR} && ./build.sh ubuntu full && \
+echo "export BOOST_ROOT=${BOOST_ROOT}" >> ~/.bashrc
 ```
 
 ## All is ready now

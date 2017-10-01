@@ -1,5 +1,128 @@
 # Currency Contract
 
+## Creating a Wallet
+
+Any transaction sent to the blockchain will need to be signed by the respective authority's private key. Before you will be able to sign the transaction, you will need a wallet to store and manage the private key.
+
+With EOS, `eosc' creates wallets:
+```bash
+./eosc wallet create
+# Creating wallet: default
+# Save password to use in the future to unlock this wallet.
+# Without password imported keys will not be retrievable.
+# "PW5JD9cw9YY288AXPvnbwUk5JK4Cy6YyZ83wzHcshu8F2akU9rRWE"
+```
+However, for development and test use, this way is annoying and troublesome. Especially, manipulation with numerous password keys is error-prone, to us. To ease our study, we develop wraps on EOS processes. For example, `eoscWalletCreate` runs the above process after deleting a previous instance of the default wallet, if such one exists, and, subsequently defines an public variable set to the password of the wallet.
+
+Note that `eoscWalletCreate` has to be used as the argument of the `source` command (see --help):
+
+```bash
+cd $EOS_PROGRAMS/eosc
+. ./eoscWalletCreate
+# $defaultWalletPswd=PW5KfPzdpyKXEJ7Yhw2BFzjypZE6FoVcmS4Fww93KNT78vr5hVgt5
+```
+You can create multiple wallets by specifying unique name:
+```bash
+. ./eoscWalletCreate second-wallet
+# $second_walletWalletPswd=PW5J6MsiNbgNu5ThgsZXk6uiVBC6o8SD1AW1jLo8XFgFFLWFbgqTe
+```
+And you will be see it in the list of your wallets:
+```bash
+./eosc wallet list
+# Wallets:
+# [
+#   "default *",
+#   "second_wallet *"
+# ]
+```
+## Importing Key to Wallet
+
+Import the key that you want to use to sign the transaction to your wallet. The following will import key for genesis accounts.
+```bash
+export initaPrivKey=5KQwrPbwdL6PhXujxW37FSSQZ1JiwsST4cqQzDeyXtP79zkvFD3 && /
+export initaPublKey=EOS6MRyAjQq8ud7hVNYcfnVPJqcVpscN5So8BhtHuGYqET5GDW5CV && /
+./eosc wallet import $initaPrivKey
+# imported private key for: EOS6MRyAjQq8ud7hVNYcfnVPJqcVpscN5So8BhtHuGYqET5GDW5CV
+```
+You will then be able to see the list of imported private keys and their respective public key:
+```bash
+./eosc wallet keys
+# [[
+#     "EOS6MRyAjQq8ud7hVNYcfnVPJqcVpscN5So8BhtHuGYqET5GDW5CV",
+#     "5KQwrPbwdL6PhXujxW37FSSQZ1JiwsST4cqQzDeyXtP79zkvFD3"
+#   ]
+# ]
+```
+## Locking and Unlocking Wallet
+
+To keep your private key safe, lock your wallet
+```bash
+./eosc wallet lock -n second_wallet
+# Locked: 'second_wallet'
+```
+Notice that the locked wallet doesn't have * symbol in the list
+```bash
+./eosc wallet list
+# Wallets:
+# [
+#  "default *",
+#  "second_wallet"
+#]
+```
+To unlock it specify the password you get when creating the wallet
+```bash
+./eosc wallet unlock -n second_wallet --password $second_walletWalletPswd
+# Unlocked: 'second-wallet'
+```
+
+## Creating an Account
+
+```bash
+. ./eoscCreateKey owner
+# $ownerPubl=5K4hEQuPvt46zY8KCb9VgD7au9ShvKsC8T4YgNQ5EWhtthoXHKK
+# $ownerPriv=EOS6Wagm98tHbogzcRPukEJhx7gVM579zyN85prxF46FnxAZFZcoQ
+
+. ./eoscCreateKey active
+# $activePubl=5KCiDbGgdMgwXj6TY9CD1u657bpmyKugDXRDqX1ezNS59APV4hE
+# $activePriv=EOS5V72zR8MX6AowFv95CPSCc2g6Q4TF12wQ5hmtpSjmHJWdT5y9i
+```
+
+Then create an account called tester:
+```bash
+./eosc wallet unlock --password $defaultWalletPswd && \
+./eosc create account inita tester $ownerPubl $activePubl
+```
+
+## All together
+
+```bash
+export initaPrivKey=5KQwrPbwdL6PhXujxW37FSSQZ1JiwsST4cqQzDeyXtP79zkvFD3 && \
+export initaPublKey=EOS6MRyAjQq8ud7hVNYcfnVPJqcVpscN5So8BhtHuGYqET5GDW5CV && \
+cd $EOS_PROGRAMS/eosc && \
+
+. ./eoscWalletCreate && \ # -> $defaultWalletPswd
+./eosc wallet import $initaPrivKey && \
+
+. ./eoscCreateKey owner && \ # -> $ownerPublKey $ownerPrivKey
+. ./eoscCreateKey active && \ # -> $activePublKey $activePrivKey
+
+./eosc wallet unlock --password $defaultWalletPswd && \
+./eosc create account inita tester  $activePubl
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 EOS comes with example contracts that can be uploaded and run for testing purposes. We demonstrate how to upload and interact with the sample contract "currency". 
 
 * Let the EOS node be running:
